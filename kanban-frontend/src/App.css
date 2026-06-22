@@ -1,184 +1,237 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+*{
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+body{
+  background-color: #fdf5e6;
+  font-weight: bold;
 }
 
-#center {
+body {
+  font-family: "Darker Grotesque", sans-serif;
+}
+
+.app-container{
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  min-height: 100vh;
+  background-color: #fdf5e6;
 }
 
-#next-steps {
+.app-header{
+  padding: 20px;
+  background-color: #ffde59;
+  border-bottom: 4px solid black;
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.app-header h1{
+  font-size: 3rem;
+  margin-right: 10px;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+/* Welcome / role banner under the header */
+.app-container > h2{
+  padding: 14px 20px 0px 20px;
+  font-size: 1.6rem;
+}
+
+.board-layout{
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  flex-direction: row;
+  gap: 20px;
+  flex: 1;
+  padding: 20px;
+  overflow-x: auto;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.kanban-column{
+  background-color: #ffffffff;
+  border: 4px solid #000;
+  border-radius: 8px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 6px 6px 6px #9d9d9d;
 }
 
-.ticks {
-  position: relative;
+.column-title{
+  padding: 12px 15px;
+  border-bottom: 4px solid black;
+  background-color: #4facfe;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.card-list{
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.kanban-card{
+  margin-bottom: 5px;
+  border: 3px solid black;
+  border-radius: 6px;
+  cursor: grab;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.kanban-card h3{
+  margin-bottom: 5px;
+  font-size: x-large;
+  font-weight: 900;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+/* ===== Shared button base ===== */
+.btn{
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 800;
+  border: 3px solid #000;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+  flex-shrink: 0;
+}
+
+.btn:active{
+  box-shadow: 0px 0px 0px #000;
+  transform: translate(3px, 3px);
+}
+
+/* ===== Header controls ===== */
+.header-btn{
+  padding: 10px 16px;
+  font-size: 1.3rem;
+}
+
+.btn-admin{
+  background-color: #c39bff;
+  color: black;
+}
+
+.btn-employee{
+  background-color: #ffb3c6;
+  color: black;
+}
+
+.btn-toggle{
+  padding: 10px 16px;
+  font-size: 1.3rem;
+  background-color: #ffffff;
+  color: black;
+  margin: 14px 0 0 20px;
+}
+
+.employee-select{
+  padding: 8px 10px;
+  font-size: 1.2rem;
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 700;
+  border: 3px solid #000;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* ===== Add task bar ===== */
+.add-task-container {
+  margin: 20px;
+  padding: 18px;
+  background-color: #b8f2ff;
+  border: 4px solid black;
+  border-radius: 8px;
+  box-shadow: 6px 6px 0px #000;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.task-input{
+  padding: 10px;
+  font-size: x-large;
+  border: 3px solid black;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 150px;
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 500;
+}
+
+.add-button{
+  padding: 10px 10px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  background-color: #90ee90;
+  color: black;
+  border: 3px solid #000;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Darker Grotesque", sans-serif;
+  box-shadow: 3px 3px 0px #000;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
+}
+
+.add-button:active {
+  box-shadow: 0px 0px 0px #000;
+  transform: translate(3px, 3px);
+}
+
+/* ===== Card action buttons ===== */
+.card-actions{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.card-input{
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  font-size: 1.1rem;
+  border: 3px solid black;
+  border-radius: 4px;
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 500;
+}
+
+/* X — delete, only shown on Approved cards */
+.btn-delete{
+  padding: 6px 12px;
+  font-size: 1.2rem;
+  background-color: #ff6b6b;
+  color: black;
+  align-self: flex-end;
+}
+
+/* Check — submit attachment link */
+.btn-submit-attachment{
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4facfe;
+  color: black;
+}
+
+/* Approve — moves Under Review -> Approved */
+.btn-approve{
+  padding: 8px 14px;
+  font-size: 1.2rem;
+  background-color: #90ee90;
+  color: black;
+  align-self: flex-end;
 }
