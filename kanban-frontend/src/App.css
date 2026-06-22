@@ -32,10 +32,10 @@ body {
 
 .app-header h1{
   font-size: 3rem;
+  font-weight: 700;
   margin-right: 10px;
 }
 
-/* Welcome / role banner under the header */
 .app-container > h2{
   padding: 14px 20px 0px 20px;
   font-size: 1.6rem;
@@ -91,13 +91,13 @@ body {
 .kanban-card h3{
   margin-bottom: 5px;
   font-size: x-large;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 /* ===== Shared button base ===== */
 .btn{
   font-family: "Darker Grotesque", sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   border: 3px solid #000;
   border-radius: 4px;
   cursor: pointer;
@@ -173,7 +173,7 @@ body {
 .add-button{
   padding: 10px 10px;
   font-size: 1.5rem;
-  font-weight: 800;
+  font-weight: 700;
   background-color: #90ee90;
   color: black;
   border: 3px solid #000;
@@ -208,7 +208,6 @@ body {
   font-weight: 500;
 }
 
-/* X — delete, only shown on Approved cards */
 .btn-delete{
   padding: 6px 12px;
   font-size: 1.2rem;
@@ -217,7 +216,6 @@ body {
   align-self: flex-end;
 }
 
-/* Check — submit attachment link */
 .btn-submit-attachment{
   padding: 6px 10px;
   display: flex;
@@ -227,11 +225,28 @@ body {
   color: black;
 }
 
-/* Approve — moves Under Review -> Approved */
 .btn-approve{
   padding: 8px 14px;
   font-size: 1.2rem;
   background-color: #90ee90;
   color: black;
   align-self: flex-end;
+}
+
+.assignee-badge{
+  display: inline-block;
+  align-self: flex-start;
+  padding: 4px 10px;
+  background-color: #fff3b0;
+  border: 2px solid black;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.pending-label{
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 600;
+  color: #555;
 }

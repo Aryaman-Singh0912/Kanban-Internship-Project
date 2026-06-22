@@ -143,35 +143,39 @@ function App() {
       <main className="board-layout">
 
         <Column title="To-Do">
-          {displayedTasks.filter((task) => task.status === 'To-Do').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} />
-          ))}
+        {displayedTasks.filter((task) => task.status === 'To-Do').map((task) => (
+          <Card key={task.id} title={task.title} description={task.description} id={task.id}
+            status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+            onAddAttachment={handleAddAttachment} onApprove={approveTask}
+            isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} />
+        ))}
         </Column>
 
         <Column title="In Progress">
-          {displayedTasks.filter((task) => task.status === 'In Progress').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} />
-          ))}
+        {displayedTasks.filter((task) => task.status === 'In Progress').map((task) => (
+          <Card key={task.id} title={task.title} description={task.description} id={task.id}
+            status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+            onAddAttachment={handleAddAttachment} onApprove={approveTask}
+            isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} />
+        ))}
         </Column>
 
         <Column title="Under Review">
-          {displayedTasks.filter((task) => task.status === 'Under Review').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} />
-          ))}
+        {displayedTasks.filter((task) => task.status === 'Under Review').map((task) => (
+          <Card key={task.id} title={task.title} description={task.description} id={task.id}
+            status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+            onAddAttachment={handleAddAttachment} onApprove={approveTask}
+            isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} />
+        ))}
         </Column>
 
         <Column title="Approved">
-          {displayedTasks.filter((task) => task.status === 'Approved').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} />
-          ))}
+        {displayedTasks.filter((task) => task.status === 'Approved').map((task) => (
+          <Card key={task.id} title={task.title} description={task.description} id={task.id}
+            status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+            onAddAttachment={handleAddAttachment} onApprove={approveTask}
+            isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} />
+        ))}
         </Column>
 
       </main>

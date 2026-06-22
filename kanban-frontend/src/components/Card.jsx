@@ -6,6 +6,7 @@ const Card = (props) => {
   let attachmentInputMarkup = null;
   let attachmentButtonSubmit = null;
   let approveButtonMarkup = null;
+  let pendingLabelMarkup = null;
 
   const [draftLink, setDraftLink] = React.useState(props.attachment);
 
@@ -36,14 +37,19 @@ const Card = (props) => {
   }
 
   if (props.status === "Under Review") {
-    approveButtonMarkup = (
-      <button className="btn btn-approve" onClick={() => props.onApprove(props.id)}>Approve</button>
-    );
+    if (props.isAdmin) {
+      approveButtonMarkup = (
+        <button className="btn btn-approve" onClick={() => props.onApprove(props.id)}>Approve</button>
+      );
+    } else {
+      pendingLabelMarkup = <span className="pending-label">Pending approval</span>;
+    }
   }
 
   return (
     <div className="kanban-card">
       <h3>{props.title}</h3>
+      <span className="assignee-badge">{props.assignee}</span>
       <p>{props.description}</p>
 
       {(attachmentInputMarkup || attachmentButtonSubmit) && (
@@ -54,6 +60,7 @@ const Card = (props) => {
       )}
 
       {approveButtonMarkup}
+      {pendingLabelMarkup}
       {deleteButtonMarkup}
     </div>
   );
