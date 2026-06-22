@@ -6,9 +6,14 @@ const Card = (props) => {
   let attachmentInputMarkup = null;
   let attachmentButtonSubmit = null;
   let approveButtonMarkup = null;
+  let declineButtonMarkup = null;
+  let declinePanelMarkup = null;
   let pendingLabelMarkup = null;
+  let feedbackMarkup = null;
 
   const [draftLink, setDraftLink] = React.useState(props.attachment);
+  const [showDeclineInput, setShowDeclineInput] = React.useState(false);
+  const [declineNote, setDeclineNote] = React.useState("");
 
   if (props.status === "Approved") {
     deleteButtonMarkup = (
@@ -36,20 +41,53 @@ const Card = (props) => {
     );
   }
 
+  const submitDecline = () => {
+    props.onDecline(props.id, declineNote);
+    setDeclineNote("");
+    setShowDeclineInput(false);
+  };
+
   if (props.status === "Under Review") {
     if (props.isAdmin) {
       approveButtonMarkup = (
         <button className="btn btn-approve" onClick={() => props.onApprove(props.id)}>Approve</button>
       );
+      declineButtonMarkup = (
+        <button className="btn btn-decline" onClick={() => setShowDeclineInput(!showDeclineInput)}>
+          Decline
+        </button>
+      );
+      if (showDeclineInput) {
+        declinePanelMarkup = (
+          <div className="decline-panel">
+            <textarea
+              className="decline-textarea"
+              placeholder="Add feedback for the employee..."
+              value={declineNote}
+              onChange={(e) => setDeclineNote(e.target.value)}
+            />
+            <button className="btn btn-send-back" onClick={submitDecline}>Send Back</button>
+          </div>
+        );
+      }
     } else {
       pendingLabelMarkup = <span className="pending-label">Pending approval</span>;
     }
+  }
+
+  if (props.feedback) {
+    feedbackMarkup = (
+      <div className="feedback-note">
+        <strong>Feedback:</strong> {props.feedback}
+      </div>
+    );
   }
 
   return (
     <div className="kanban-card">
       <h3>{props.title}</h3>
       <span className="assignee-badge">{props.assignee}</span>
+      {feedbackMarkup}
       <p>{props.description}</p>
 
       {(attachmentInputMarkup || attachmentButtonSubmit) && (
@@ -59,7 +97,13 @@ const Card = (props) => {
         </div>
       )}
 
-      {approveButtonMarkup}
+      {(approveButtonMarkup || declineButtonMarkup) && (
+        <div className="review-actions">
+          {approveButtonMarkup}
+          {declineButtonMarkup}
+        </div>
+      )}
+      {declinePanelMarkup}
       {pendingLabelMarkup}
       {deleteButtonMarkup}
     </div>

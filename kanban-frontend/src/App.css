@@ -94,7 +94,6 @@ body {
   font-weight: 700;
 }
 
-/* ===== Shared button base ===== */
 .btn{
   font-family: "Darker Grotesque", sans-serif;
   font-weight: 700;
@@ -109,6 +108,13 @@ body {
 .btn:active{
   box-shadow: 0px 0px 0px #000;
   transform: translate(3px, 3px);
+}
+
+.btn-active{
+  box-shadow: 0px 0px 0px #000;
+  transform: translate(3px, 3px);
+  outline: 3px solid #000;
+  outline-offset: 3px;
 }
 
 /* ===== Header controls ===== */
@@ -132,7 +138,6 @@ body {
   font-size: 1.3rem;
   background-color: #ffffff;
   color: black;
-  margin: 14px 0 0 20px;
 }
 
 .employee-select{
@@ -146,7 +151,34 @@ body {
   cursor: pointer;
 }
 
-/* ===== Add task bar ===== */
+.admin-controls{
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-row{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 14px 0 0 20px;
+  flex-wrap: wrap;
+}
+
+.mode-heading{
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  background-color: #fff3b0;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+.select-employee-hint{
+  margin: 14px 20px 0 20px;
+  font-style: italic;
+  color: #555;
+}
+
 .add-task-container {
   margin: 20px;
   padding: 18px;
@@ -189,7 +221,6 @@ body {
   transform: translate(3px, 3px);
 }
 
-/* ===== Card action buttons ===== */
 .card-actions{
   display: flex;
   gap: 10px;
@@ -225,12 +256,61 @@ body {
   color: black;
 }
 
+.review-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  width: 100%;
+}
+
 .btn-approve{
   padding: 8px 14px;
   font-size: 1.2rem;
   background-color: #90ee90;
   color: black;
+}
+
+.btn-decline{
+  padding: 8px 14px;
+  font-size: 1.2rem;
+  background-color: #ffa94d;
+  color: black;
+}
+
+.decline-panel{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.decline-textarea{
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border: 3px solid black;
+  border-radius: 4px;
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  resize: vertical;
+}
+
+.btn-send-back{
+  padding: 8px 14px;
+  font-size: 1.1rem;
+  background-color: #ffa94d;
+  color: black;
   align-self: flex-end;
+}
+
+.feedback-note{
+  background-color: #ffe8cc;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .assignee-badge{
