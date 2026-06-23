@@ -4,6 +4,24 @@
   box-sizing: border-box;
 }
 
+:root{
+  --color-blue: #4facfe;
+  --color-orange: #ffa94d;
+  --color-pink: #ff6ec7;
+  --color-teal: #2ec4b6;
+  --color-purple: #c39bff;
+
+  --bg-blue: #eaf6ff;
+  --bg-orange: #fff3e6;
+  --bg-pink: #ffeaf6;
+  --bg-teal: #e6f9f7;
+
+  --card-blue: #cfeaff;
+  --card-orange: #ffdfb8;
+  --card-pink: #ffc7ea;
+  --card-teal: #bdeee7;
+}
+
 body{
   background-color: #fdf5e6;
   font-weight: bold;
@@ -50,8 +68,12 @@ body {
   overflow-x: auto;
 }
 
+.board-layout.review-layout{
+  justify-content: center;
+}
+
 .kanban-column{
-  background-color: #ffffffff;
+  background-color: #ffffff;
   border: 4px solid #000;
   border-radius: 8px;
   width: 300px;
@@ -60,20 +82,42 @@ body {
   box-shadow: 6px 6px 6px #9d9d9d;
 }
 
+.kanban-column--todo{ background-color: var(--bg-blue); }
+.kanban-column--progress{ background-color: var(--bg-orange); }
+.kanban-column--review{ background-color: var(--bg-pink); }
+.kanban-column--approved{ background-color: var(--bg-teal); }
+
+.kanban-column--full{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
 .column-title{
   padding: 12px 15px;
   border-bottom: 4px solid black;
-  background-color: #4facfe;
+  background-color: var(--color-blue);
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
+
+.column-title--todo{ background-color: var(--color-blue); }
+.column-title--progress{ background-color: var(--color-orange); }
+.column-title--review{ background-color: var(--color-pink); }
+.column-title--approved{ background-color: var(--color-teal); }
 
 .card-list{
   padding: 15px;
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.kanban-column--full .card-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-items: start;
 }
 
 .kanban-card{
@@ -86,7 +130,14 @@ body {
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  background-color: #ffffff;
+  box-shadow: 4px 4px 0px #000;
 }
+
+.card-todo{ background-color: var(--card-blue); }
+.card-progress{ background-color: var(--card-orange); }
+.card-review{ background-color: var(--card-pink); }
+.card-approved{ background-color: var(--card-teal); }
 
 .kanban-card h3{
   margin-bottom: 5px;
@@ -94,6 +145,7 @@ body {
   font-weight: 700;
 }
 
+/* ===== Shared button base ===== */
 .btn{
   font-family: "Darker Grotesque", sans-serif;
   font-weight: 700;
@@ -124,7 +176,7 @@ body {
 }
 
 .btn-admin{
-  background-color: #c39bff;
+  background-color: var(--color-purple);
   color: black;
 }
 
@@ -151,6 +203,7 @@ body {
   cursor: pointer;
 }
 
+/* ===== Admin mode block ===== */
 .admin-controls{
   display: flex;
   flex-direction: column;
@@ -179,6 +232,7 @@ body {
   color: #555;
 }
 
+/* ===== Add task bar ===== */
 .add-task-container {
   margin: 20px;
   padding: 18px;
@@ -221,6 +275,7 @@ body {
   transform: translate(3px, 3px);
 }
 
+/* ===== Card action buttons ===== */
 .card-actions{
   display: flex;
   gap: 10px;
@@ -237,6 +292,7 @@ body {
   border-radius: 4px;
   font-family: "Darker Grotesque", sans-serif;
   font-weight: 500;
+  background-color: #ffffff;
 }
 
 .btn-delete{
@@ -252,8 +308,24 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #4facfe;
+  background-color: var(--color-blue);
   color: black;
+}
+
+.attachment-link{
+  display: inline-block;
+  align-self: flex-start;
+  padding: 6px 12px;
+  background-color: #ffffff;
+  border: 2px solid black;
+  border-radius: 4px;
+  font-weight: 700;
+  text-decoration: none;
+  color: black;
+}
+
+.attachment-link:hover{
+  background-color: var(--color-blue);
 }
 
 .review-actions{
@@ -273,7 +345,7 @@ body {
 .btn-decline{
   padding: 8px 14px;
   font-size: 1.2rem;
-  background-color: #ffa94d;
+  background-color: var(--color-orange);
   color: black;
 }
 
@@ -294,18 +366,19 @@ body {
   font-weight: 500;
   font-size: 1rem;
   resize: vertical;
+  background-color: #ffffff;
 }
 
 .btn-send-back{
   padding: 8px 14px;
   font-size: 1.1rem;
-  background-color: #ffa94d;
+  background-color: var(--color-orange);
   color: black;
   align-self: flex-end;
 }
 
 .feedback-note{
-  background-color: #ffe8cc;
+  background-color: #ffffff;
   border: 2px solid black;
   border-radius: 4px;
   padding: 8px 10px;
@@ -313,17 +386,19 @@ body {
   font-weight: 500;
 }
 
+/* ===== Assignee badge ===== */
 .assignee-badge{
   display: inline-block;
   align-self: flex-start;
   padding: 4px 10px;
-  background-color: #fff3b0;
+  background-color: var(--color-purple);
   border: 2px solid black;
   border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 700;
 }
 
+/* ===== Pending approval label ===== */
 .pending-label{
   font-size: 1rem;
   font-style: italic;

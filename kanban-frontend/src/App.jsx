@@ -21,6 +21,8 @@ function App() {
   const [employeeIdentity, setEmployeeIdentity] = useState("Employee A");
   const [adminViewFilter, setAdminViewFilter] = useState("Employee A");
 
+  const isReviewQueue = currentUserRole === 'Admin' && adminMode === 'Review';
+
   let displayedTasks = tasks;
 
   if (currentUserRole === 'Employee') {
@@ -178,43 +180,56 @@ function App() {
 
       {headerControlsMarkup}
 
-      <main className="board-layout">
+      <main className={isReviewQueue ? "board-layout review-layout" : "board-layout"}>
 
-        <Column title="To-Do">
-          {displayedTasks.filter((task) => task.status === 'To-Do').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-              isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
-          ))}
-        </Column>
+        {isReviewQueue ? (
+          <Column title="For Review" variant="review" fullWidth>
+            {displayedTasks.map((task) => (
+              <Card key={task.id} title={task.title} description={task.description} id={task.id}
+                status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
+                isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+            ))}
+          </Column>
+        ) : (
+          <>
+            <Column title="To-Do" variant="todo">
+              {displayedTasks.filter((task) => task.status === 'To-Do').map((task) => (
+                <Card key={task.id} title={task.title} description={task.description} id={task.id}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
+                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+              ))}
+            </Column>
 
-        <Column title="In Progress">
-          {displayedTasks.filter((task) => task.status === 'In Progress').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-              isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
-          ))}
-        </Column>
+            <Column title="In Progress" variant="progress">
+              {displayedTasks.filter((task) => task.status === 'In Progress').map((task) => (
+                <Card key={task.id} title={task.title} description={task.description} id={task.id}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
+                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+              ))}
+            </Column>
 
-        <Column title="Under Review">
-          {displayedTasks.filter((task) => task.status === 'Under Review').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-              isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
-          ))}
-        </Column>
+            <Column title="Under Review" variant="review">
+              {displayedTasks.filter((task) => task.status === 'Under Review').map((task) => (
+                <Card key={task.id} title={task.title} description={task.description} id={task.id}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
+                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+              ))}
+            </Column>
 
-        <Column title="Approved">
-          {displayedTasks.filter((task) => task.status === 'Approved').map((task) => (
-            <Card key={task.id} title={task.title} description={task.description} id={task.id}
-              status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
-              onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-              isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
-          ))}
-        </Column>
+            <Column title="Approved" variant="approved">
+              {displayedTasks.filter((task) => task.status === 'Approved').map((task) => (
+                <Card key={task.id} title={task.title} description={task.description} id={task.id}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
+                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+              ))}
+            </Column>
+          </>
+        )}
 
       </main>
 

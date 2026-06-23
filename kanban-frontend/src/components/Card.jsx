@@ -5,6 +5,7 @@ const Card = (props) => {
   let deleteButtonMarkup = null;
   let attachmentInputMarkup = null;
   let attachmentButtonSubmit = null;
+  let attachmentLinkMarkup = null;
   let approveButtonMarkup = null;
   let declineButtonMarkup = null;
   let declinePanelMarkup = null;
@@ -35,9 +36,17 @@ const Card = (props) => {
         className="card-input"
         type="text"
         onChange={(event) => setDraftLink(event.target.value)}
-        placeholder="Paste Code Link"
+        placeholder="Paste Code Link Here"
         value={draftLink}
       />
+    );
+  }
+
+  if ((props.status === "Under Review" || props.status === "Approved") && props.attachment) {
+    attachmentLinkMarkup = (
+      <a className="attachment-link" href={props.attachment} target="_blank" rel="noopener noreferrer">
+        View Code Submission
+      </a>
     );
   }
 
@@ -83,8 +92,16 @@ const Card = (props) => {
     );
   }
 
+  const statusClassMap = {
+    "To-Do": "card-todo",
+    "In Progress": "card-progress",
+    "Under Review": "card-review",
+    "Approved": "card-approved"
+  };
+  const statusClass = statusClassMap[props.status] || "";
+
   return (
-    <div className="kanban-card">
+    <div className={`kanban-card ${statusClass}`}>
       <h3>{props.title}</h3>
       <span className="assignee-badge">{props.assignee}</span>
       {feedbackMarkup}
@@ -96,6 +113,8 @@ const Card = (props) => {
           {attachmentButtonSubmit}
         </div>
       )}
+
+      {attachmentLinkMarkup}
 
       {(approveButtonMarkup || declineButtonMarkup) && (
         <div className="review-actions">
