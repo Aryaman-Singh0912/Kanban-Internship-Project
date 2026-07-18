@@ -12,4 +12,5 @@ class Task(Base):
     attachment_url = Column(String, nullable=True)
     feedback = Column(String, nullable=True)
     assignee_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assignee = relationship("User", back_populates="tasks")
 

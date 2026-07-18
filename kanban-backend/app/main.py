@@ -6,9 +6,11 @@ from app.routers import auth
 from app.utils import get_current_user
 from app.models.user import User
 from app.schemas import UserResponse
+from app.routers import tasks
 
 app = FastAPI()
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
 
 @app.get("/me", response_model=UserResponse)
 def get_me(current_user : User = Depends(get_current_user)):
