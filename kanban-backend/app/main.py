@@ -7,8 +7,15 @@ from app.utils import get_current_user
 from app.models.user import User
 from app.schemas import UserResponse
 from app.routers import tasks
+from fastapi.middleware.cors import CORSMiddleware
+
+allowed_origins = ["http://localhost:5173"]
+
 
 app = FastAPI()
+
+app.add_middleware(CORSMiddleware, allow_origins=allowed_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
 
