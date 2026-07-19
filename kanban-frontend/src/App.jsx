@@ -1,17 +1,15 @@
 import './App.css';
 import Card from './components/Card.jsx';
 import Column from './components/Column.jsx';
-import { useState } from 'react';
-import api from './api/axiosInstance';
 import Login from './components/Login.jsx';
-
-
-
+import { useState, useEffect } from 'react';
+import api from './api/axiosInstance';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [authError, setAuthError] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const initialTasks = [
     { id: 1, title: "Design Database", description: "Create the PostgreSQL schema.", status: "To-Do", assignee: "Employee A", attachmentUrl: "", feedback: "" },
@@ -26,9 +24,50 @@ function App() {
   const [tasks, setTasks] = useState(initialTasks);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDesc, setNewTaskDescription] = useState("");
-  const [currentUserRole, setCurrentUserRole] = useState("Employee");
   const [employeeIdentity, setEmployeeIdentity] = useState("Employee A");
   const [adminViewFilter, setAdminViewFilter] = useState("Employee A");
+
+  const currentUserRole = currentUser?.role === 'admin' ? 'Admin' : 'Employee';
+
+  useEffect(() => {
+    if (!token) {
+      setCurrentUser(null);
+      return;
+    }
+    api.get('/me')
+      .then((response) => setCurrentUser(response.data))
+      .catch(() => {
+        localStorage.removeItem('token');
+        setToken(null);
+      });
+  }, [token]);
+
+  const handleLogin = async (email, password) => {
+    setAuthError(null);
+    setAuthLoading(true);
+
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    try {
+      const response = await api.post('/auth/login', formData, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      localStorage.setItem('token', response.data.access_token);
+      setToken(response.data.access_token);
+    } catch (err) {
+      setAuthError('Invalid email or password');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setCurrentUser(null);
+  };
 
   const isReviewQueue = currentUserRole === 'Admin' && adminMode === 'Review';
 
@@ -45,27 +84,6 @@ function App() {
         : tasks.filter((task) => task.assignee === adminViewFilter);
     }
   }
-
-  const handleLogin = async (email, password) => {
-    setAuthError(null);
-    setAuthLoading(true);
-
-    const formData = new URLSearchParams();
-    formData.append('username', email);
-    formData.append('password', password);
-
-    try {
-      const response = await api.post('/auth/login', formData, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
-      localStorage.setItem('token', response.data.access_token);
-      setToken(response.data.access_token);
-    } catch (error) {
-      setAuthError('Invalid email or password');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
 
   function handleAddTask() {
     if (newTaskTitle === "") return;
@@ -188,27 +206,17 @@ function App() {
     );
   }
 
-   if (!token) {
-      return <Login onLogin={handleLogin} error={authError} loading={authLoading} />;
-    }
+  if (!token) {
+    return <Login onLogin={handleLogin} error={authError} loading={authLoading} />;
+  }
 
   return (
     <div className="app-container">
 
       <header className="app-header">
         <h1>Kanban</h1>
-        <button
-          className={`btn header-btn btn-admin ${currentUserRole === 'Admin' ? 'btn-active' : ''}`}
-          onClick={() => setCurrentUserRole("Admin")}
-        >
-          Login as Admin
-        </button>
-        <button
-          className={`btn header-btn btn-employee ${currentUserRole === 'Employee' ? 'btn-active' : ''}`}
-          onClick={() => setCurrentUserRole("Employee")}
-        >
-          Login as Employee
-        </button>
+        <span className="assignee-badge">{currentUser?.email}</span>
+        <button className="btn header-btn btn-employee" onClick={handleLogout}>Logout</button>
         {topDropdown}
       </header>
 
