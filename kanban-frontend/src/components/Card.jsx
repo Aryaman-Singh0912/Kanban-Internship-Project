@@ -16,7 +16,7 @@ const Card = (props) => {
   const [showDeclineInput, setShowDeclineInput] = React.useState(false);
   const [declineNote, setDeclineNote] = React.useState("");
 
-  if (props.status === "Approved" && props.canDelete) {
+  if (props.canDelete && (props.isAdmin || props.status === "Approved")) {
     deleteButtonMarkup = (
       <button className="btn btn-delete" onClick={() => props.onDelete(props.id)}>X</button>
     );
@@ -26,7 +26,13 @@ const Card = (props) => {
     props.onAddAttachment(props.id, draftLink);
   };
 
-  if (props.status === "To-Do" || props.status === "In Progress") {
+  const getSafeUrl = (url) => {
+    if (!url) return '';
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://${url}`;
+  };
+
+  if ((props.status === "To-Do" || props.status === "In Progress") && !props.isAdmin) {
     attachmentButtonSubmit = (
       <button className="btn btn-submit-attachment" onClick={submitAttachment}><Check /></button>
     );
@@ -44,7 +50,7 @@ const Card = (props) => {
 
   if ((props.status === "Under Review" || props.status === "Approved") && props.attachment) {
     attachmentLinkMarkup = (
-      <a className="attachment-link" href={props.attachment} target="_blank" rel="noopener noreferrer">
+      <a className="attachment-link" href={getSafeUrl(props.attachment)} target="_blank" rel="noopener noreferrer">
         View Code Submission
       </a>
     );
