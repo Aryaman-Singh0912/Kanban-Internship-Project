@@ -3,19 +3,17 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.task import Task
 from app.models.user import User
-from app.schemas import TaskCreate, TaskResponse, TaskUpdate
+from app.schemas import TaskCreate, TaskResponse, TaskUpdate, TaskDecline
 from app.utils import get_current_user
-from app.schemas import TaskDecline
 
 router = APIRouter()
 
-@router.post("/", response_model= TaskResponse)
+@router.post("/", response_model=TaskResponse)
 def create_task(task: TaskCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    new_task = Task(title= task.title, description = task.description, status = task.status, assignee_id = task.assignee_id)
+    new_task = Task(title=task.title, description=task.description, status=task.status, assignee_id=task.assignee_id)
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
-
     return new_task
 
 @router.get("/", response_model=list[TaskResponse])
@@ -26,7 +24,6 @@ def get_tasks(current_user: User = Depends(get_current_user), db: Session = Depe
     else:
         tasks = db.query(Task).filter(Task.assignee_id == current_user.id).all()
         return tasks
-    
 
 @router.get("/{task_id}", response_model=TaskResponse)
 def get_one_task(task_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -71,18 +68,21 @@ def update_task(task_id: int, task_data: TaskUpdate, db: Session = Depends(get_d
     db.commit()
     db.refresh(task)
     return task
-    
+
 @router.delete("/{task_id}", status_code=204)
 def delete_task(task_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
 
-    if current_user.role == 'employee':
-        raise HTTPException(status_code=403, detail="Not allowed to delete own tasks")
-    
-    deleted_task = db.query(Task).filter(Task.id == task_id).first()
-
-    if deleted_task is None:
+    if task is None:
         raise HTTPException(status_code=404, detail="Not found")
-    db.delete(deleted_task)
+
+    if current_user.role != 'admin':
+        if task.assignee_id != current_user.id:
+            raise HTTPException(status_code=403, detail="You can only delete your own tasks")
+        if task.status != "Approved":
+            raise HTTPException(status_code=403, detail="You can only delete tasks that have been approved")
+
+    db.delete(task)
     db.commit()
 
 @router.patch("/{task_id}/approve", response_model=TaskResponse)

@@ -16,7 +16,7 @@ const Card = (props) => {
   const [showDeclineInput, setShowDeclineInput] = React.useState(false);
   const [declineNote, setDeclineNote] = React.useState("");
 
-  if (props.status === "Approved" && props.isAdmin) {
+  if (props.status === "Approved" && props.canDelete) {
     deleteButtonMarkup = (
       <button className="btn btn-delete" onClick={() => props.onDelete(props.id)}>X</button>
     );

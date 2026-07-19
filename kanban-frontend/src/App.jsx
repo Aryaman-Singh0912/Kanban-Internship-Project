@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import './App.css';
 import Card from './components/Card.jsx';
 import Column from './components/Column.jsx';
@@ -78,6 +79,18 @@ function App() {
     }
   };
 
+  const handleRegister = async (email, password) => {
+    setAuthError(null);
+    setAuthLoading(true);
+    try {
+      await api.post('/auth/register', { email, password });
+      await handleLogin(email, password);
+    } catch (err) {
+      setAuthError('Could not register — that email may already be taken.');
+      setAuthLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -120,14 +133,6 @@ function App() {
   };
 
   const deleteTask = async (deletedTaskId) => {
-    const taskFind = tasks.find((task) => task.id === deletedTaskId);
-    if (!taskFind) return;
-
-    if (taskFind.status !== "Approved") {
-      alert('You can only delete tasks approved by an admin.');
-      return;
-    }
-
     try {
       await api.delete(`/tasks/${deletedTaskId}`);
       setTasks(tasks.filter((task) => task.id !== deletedTaskId));
@@ -235,7 +240,7 @@ function App() {
   }
 
   if (!token) {
-    return <Login onLogin={handleLogin} error={authError} loading={authLoading} />;
+    return <Login onLogin={handleLogin} onRegister={handleRegister} error={authError} loading={authLoading} />;
   }
 
   return (
@@ -258,7 +263,7 @@ function App() {
               <Card key={task.id} title={task.title} description={task.description} id={task.id}
                 status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                 onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
+                isAdmin={currentUserRole === 'Admin'} canDelete={currentUserRole === 'Admin' || task.assignee_id === currentUser?.id} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
             ))}
           </Column>
         ) : (
@@ -268,7 +273,7 @@ function App() {
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
                   status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} canDelete={currentUserRole === 'Admin' || task.assignee_id === currentUser?.id} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
@@ -277,7 +282,7 @@ function App() {
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
                   status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} canDelete={currentUserRole === 'Admin' || task.assignee_id === currentUser?.id} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
@@ -286,7 +291,7 @@ function App() {
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
                   status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} canDelete={currentUserRole === 'Admin' || task.assignee_id === currentUser?.id} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
@@ -295,7 +300,7 @@ function App() {
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
                   status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} canDelete={currentUserRole === 'Admin' || task.assignee_id === currentUser?.id} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
           </>
