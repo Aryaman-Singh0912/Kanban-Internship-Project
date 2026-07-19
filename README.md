@@ -9,10 +9,21 @@ Unlike standard drag-and-drop sticky note apps, this application enforces real-w
 ![Database](https://img.shields.io/badge/Database-PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white)
 ![Auth](https://img.shields.io/badge/Auth-JWT-black?style=flat-square)
 
+> Built during my internship for **AllCargo Logistics Ltd.** (Gurugram). No live deployment link — the app is meant to be cloned and run on the company's internal database, and showcasing a live demo would require sharing admin/user credentials tied to that database.
+
+---
+
+## Demo
+
+> Screen recording walkthrough — live deployment isn't available since admin/user credentials are tied to the company's internal database.
+
+https://github.com/user-attachments/assets/your-video-id-here
+
 ---
 
 ## Table of Contents
 
+- [Demo](#demo)
 - [Overview](#overview)
 - [Design System](#design-system-neo-brutalism)
 - [Key Features](#key-features-and-business-logic)
@@ -50,13 +61,11 @@ This project actively rejects the soft, rounded, low-contrast corporate aestheti
 ### 1. Role-Based Access Control (RBAC)
 
 **Employee Portal**
-
 - **Scoped Identity** — employees only view tasks explicitly assigned to them
 - **Restricted Permissions** — employees cannot self-assign tasks, cannot view peer boards, and the "Add New Task" control is fully hidden from their view
 - **Feedback Loop** — declined tasks automatically display the admin's rejection notes directly inside the task card
 
 **Administrator Portal**
-
 - **Dual-Mode Engine** — admins can toggle between Review Mode (a global filter for all tasks awaiting approval) and Employee View (inspecting a specific worker's board)
 - **Master Dispatcher** — full clearance to create, assign, and distribute tasks to any employee
 - **The Gatekeeper** — admins alone can approve submissions or decline them back to the employee with mandatory feedback
@@ -68,7 +77,7 @@ Tasks follow a strict, controlled lifecycle and cannot jump stages arbitrarily:
 1. **To-Do** — created by an Admin and assigned to an employee
 2. **In Progress** — triggered once the employee attaches a code/attachment link to the card
 3. **Under Review** — triggered when the employee submits the task for admin review
-4. **Approved** — granted only via the admin verification dashboard (or **declined**, which sends it back to _In Progress_ with feedback attached)
+4. **Approved** — granted only via the admin verification dashboard (or **declined**, which sends it back to *In Progress* with feedback attached)
 
 ### 3. Safe Deletion Guardrails
 
@@ -79,14 +88,12 @@ Tasks follow a strict, controlled lifecycle and cannot jump stages arbitrarily:
 ## Tech Stack
 
 **Frontend** (`kanban-frontend/`)
-
 - [React 19](https://react.dev/) with [Vite](https://vitejs.dev/)
 - [Axios](https://axios-http.com/) for API requests (with a JWT-attaching interceptor)
 - [Lucide React](https://lucide.dev/) for icons
 - Plain CSS (Neo-Brutalist design system)
 
 **Backend** (`kanban-backend/`)
-
 - [FastAPI](https://fastapi.tiangolo.com/) (Python)
 - [SQLAlchemy 2.0](https://www.sqlalchemy.org/) ORM
 - [Alembic](https://alembic.sqlalchemy.org/) for database migrations
@@ -119,6 +126,7 @@ Kanban-Internship-Project/
     ├── package.json
     └── vite.config.js
 ```
+
 ## Getting Started
 
 ### Prerequisites
@@ -183,31 +191,35 @@ ALGORITHM=HS256
 
 ## API Reference
 
-| Method   | Endpoint                   | Description                                                                | Access                                  |
-| -------- | -------------------------- | -------------------------------------------------------------------------- | --------------------------------------- |
-| `POST`   | `/auth/register`           | Register a new employee account                                            | Public                                  |
-| `POST`   | `/auth/login`              | Log in and receive a JWT access token                                      | Public                                  |
-| `GET`    | `/me`                      | Get the current authenticated user                                         | Authenticated                           |
-| `GET`    | `/users`                   | List all users                                                             | Admin only                              |
-| `GET`    | `/tasks/`                  | List tasks (all tasks for admins, own tasks for employees)                 | Authenticated                           |
-| `GET`    | `/tasks/{task_id}`         | Get a single task                                                          | Owner or Admin                          |
-| `POST`   | `/tasks/`                  | Create a task                                                              | Admin only                              |
-| `PATCH`  | `/tasks/{task_id}`         | Update a task (title, description, status, assignee, attachment, feedback) | Owner or Admin (some fields Admin-only) |
-| `PATCH`  | `/tasks/{task_id}/approve` | Approve a task                                                             | Admin only                              |
-| `PATCH`  | `/tasks/{task_id}/decline` | Decline a task back to "In Progress" with feedback                         | Admin only                              |
-| `DELETE` | `/tasks/{task_id}`         | Delete a task (Approved tasks only for employees)                          | Owner or Admin                          |
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/auth/register` | Register a new employee account | Public |
+| `POST` | `/auth/login` | Log in and receive a JWT access token | Public |
+| `GET` | `/me` | Get the current authenticated user | Authenticated |
+| `GET` | `/users` | List all users | Admin only |
+| `GET` | `/tasks/` | List tasks (all tasks for admins, own tasks for employees) | Authenticated |
+| `GET` | `/tasks/{task_id}` | Get a single task | Owner or Admin |
+| `POST` | `/tasks/` | Create a task | Admin only |
+| `PATCH` | `/tasks/{task_id}` | Update a task (title, description, status, assignee, attachment, feedback) | Owner or Admin (some fields Admin-only) |
+| `PATCH` | `/tasks/{task_id}/approve` | Approve a task | Admin only |
+| `PATCH` | `/tasks/{task_id}/decline` | Decline a task back to "In Progress" with feedback | Admin only |
+| `DELETE` | `/tasks/{task_id}` | Delete a task (Approved tasks only for employees) | Owner or Admin |
 
 Full interactive API documentation is auto-generated by FastAPI at `/docs` once the backend is running.
 
 ## Roles & Permissions
 
-| Action                                | Employee                | Admin    |
-| ------------------------------------- | ----------------------- | -------- |
-| View own tasks                        | ✅                      | ✅       |
-| View all tasks                        | ❌                      | ✅       |
-| Create tasks                          | ❌                      | ✅       |
-| Assign/reassign tasks                 | ❌                      | ✅       |
-| Attach a link / move to "In Progress" | ✅                      | ✅       |
-| Submit task for review                | ✅                      | ✅       |
-| Approve / decline tasks               | ❌                      | ✅       |
-| Delete tasks                          | ✅ (own, Approved only) | ✅ (any) |
+| Action | Employee | Admin |
+|---|---|---|
+| View own tasks | ✅ | ✅ |
+| View all tasks | ❌ | ✅ |
+| Create tasks | ❌ | ✅ |
+| Assign/reassign tasks | ❌ | ✅ |
+| Attach a link / move to "In Progress" | ✅ | ✅ |
+| Submit task for review | ✅ | ✅ |
+| Approve / decline tasks | ❌ | ✅ |
+| Delete tasks | ✅ (own, Approved only) | ✅ (any) |
+
+## License
+
+This project was built as part of an internship for **AllCargo Logistics Ltd.** Code is shared here for portfolio purposes only and is not licensed for reuse, modification, or redistribution.
