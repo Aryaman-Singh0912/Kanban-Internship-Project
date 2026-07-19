@@ -2,8 +2,17 @@ import './App.css';
 import Card from './components/Card.jsx';
 import Column from './components/Column.jsx';
 import { useState } from 'react';
+import api from './api/axiosInstance';
+import Login from './components/Login.jsx';
+
+
+
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [authError, setAuthError] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+
   const initialTasks = [
     { id: 1, title: "Design Database", description: "Create the PostgreSQL schema.", status: "To-Do", assignee: "Employee A", attachmentUrl: "", feedback: "" },
     { id: 2, title: "Setup Vite", description: "Initialize the React frontend.", status: "To-Do", assignee: "Employee B", attachmentUrl: "", feedback: "" },
@@ -36,6 +45,27 @@ function App() {
         : tasks.filter((task) => task.assignee === adminViewFilter);
     }
   }
+
+  const handleLogin = async (email, password) => {
+    setAuthError(null);
+    setAuthLoading(true);
+
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    try {
+      const response = await api.post('/auth/login', formData, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+      localStorage.setItem('token', response.data.access_token);
+      setToken(response.data.access_token);
+    } catch (error) {
+      setAuthError('Invalid email or password');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   function handleAddTask() {
     if (newTaskTitle === "") return;
@@ -157,6 +187,10 @@ function App() {
       </div>
     );
   }
+
+   if (!token) {
+      return <Login onLogin={handleLogin} error={authError} loading={authLoading} />;
+    }
 
   return (
     <div className="app-container">
