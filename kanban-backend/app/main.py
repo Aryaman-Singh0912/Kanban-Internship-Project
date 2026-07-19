@@ -8,6 +8,7 @@ from app.models.user import User
 from app.schemas import UserResponse
 from app.routers import tasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Depends, HTTPException
 
 allowed_origins = ["http://localhost:5173"]
 
@@ -30,3 +31,10 @@ def test_db(db: Session = Depends(get_db)):
 @app.get("/")
 def read_root():
     return {"message": "hello world"}
+
+@app.get("/users", response_model=list[UserResponse])
+def get_users(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.role != 'admin':
+        raise HTTPException(status_code=403, detail="Only admins can view the user list")
+    users = db.query(User).all()
+    return users

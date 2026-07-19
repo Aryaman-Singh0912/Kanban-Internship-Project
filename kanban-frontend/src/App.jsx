@@ -11,21 +11,13 @@ function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  const initialTasks = [
-    { id: 1, title: "Design Database", description: "Create the PostgreSQL schema.", status: "To-Do", assignee: "Employee A", attachmentUrl: "", feedback: "" },
-    { id: 2, title: "Setup Vite", description: "Initialize the React frontend.", status: "To-Do", assignee: "Employee B", attachmentUrl: "", feedback: "" },
-    { id: 3, title: "Write CSS", description: "Style the board with high contrast.", status: "In Progress", assignee: "Employee C", attachmentUrl: "", feedback: "" },
-    { id: 4, title: "Read Project Brief", description: "Understand the requirements.", status: "Approved", assignee: "Employee D", attachmentUrl: "", feedback: "" },
-    { id: 5, title: "Meeting Client", description: "Meet with the latest client", status: "To-Do", assignee: "Employee A", attachmentUrl: "", feedback: "" },
-    { id: 6, title: "Fix Backend", description: "Understand the Backend.", status: "Under Review", assignee: "Employee B", attachmentUrl: "", feedback: "" }
-  ];
+  const [tasks, setTasks] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const [adminMode, setAdminMode] = useState("Review");
-  const [tasks, setTasks] = useState(initialTasks);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDesc, setNewTaskDescription] = useState("");
-  const [employeeIdentity, setEmployeeIdentity] = useState("Employee A");
-  const [adminViewFilter, setAdminViewFilter] = useState("Employee A");
+  const [adminViewFilter, setAdminViewFilter] = useState("All");
 
   const currentUserRole = currentUser?.role === 'admin' ? 'Admin' : 'Employee';
 
@@ -41,6 +33,29 @@ function App() {
         setToken(null);
       });
   }, [token]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    api.get('/tasks/')
+      .then((response) => setTasks(response.data))
+      .catch((err) => console.error('Failed to load tasks', err));
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== 'admin') {
+      setUsers([]);
+      return;
+    }
+    api.get('/users')
+      .then((response) => setUsers(response.data))
+      .catch((err) => console.error('Failed to load users', err));
+  }, [currentUser]);
+
+  const getAssigneeEmail = (assigneeId) => {
+    if (currentUser?.role !== 'admin') return currentUser?.email || '';
+    const match = users.find((u) => u.id === assigneeId);
+    return match ? match.email : `User #${assigneeId}`;
+  };
 
   const handleLogin = async (email, password) => {
     setAuthError(null);
@@ -67,78 +82,95 @@ function App() {
     localStorage.removeItem('token');
     setToken(null);
     setCurrentUser(null);
+    setTasks([]);
+    setUsers([]);
   };
 
   const isReviewQueue = currentUserRole === 'Admin' && adminMode === 'Review';
 
   let displayedTasks = tasks;
 
-  if (currentUserRole === 'Employee') {
-    displayedTasks = tasks.filter((task) => task.assignee === employeeIdentity);
-  } else {
+  if (currentUserRole === 'Admin') {
     if (adminMode === "Review") {
       displayedTasks = tasks.filter((task) => task.status === "Under Review");
     } else if (adminMode === "EmployeeBoard") {
       displayedTasks = adminViewFilter === "All"
         ? tasks
-        : tasks.filter((task) => task.assignee === adminViewFilter);
+        : tasks.filter((task) => task.assignee_id === adminViewFilter);
     }
   }
 
-  function handleAddTask() {
+  const handleAddTask = async () => {
     if (newTaskTitle === "") return;
-    if (currentUserRole === 'Admin' && adminMode === 'EmployeeBoard' && adminViewFilter === 'All') return;
+    if (adminViewFilter === "All") return;
 
-    const assignee = currentUserRole === 'Admin' ? adminViewFilter : employeeIdentity;
+    try {
+      const response = await api.post('/tasks/', {
+        title: newTaskTitle,
+        description: newTaskDesc,
+        assignee_id: adminViewFilter,
+        status: "To-Do"
+      });
+      setTasks([...tasks, response.data]);
+      setNewTaskTitle("");
+      setNewTaskDescription("");
+    } catch (err) {
+      alert('Could not create task.');
+    }
+  };
 
-    const newTask = {
-      id: Date.now(),
-      title: newTaskTitle,
-      description: newTaskDesc,
-      status: "To-Do",
-      assignee: assignee,
-      attachmentUrl: "",
-      feedback: ""
-    };
-
-    setTasks([...tasks, newTask]);
-    setNewTaskTitle("");
-    setNewTaskDescription("");
-  }
-
-  const deleteTask = (deletedTaskId) => {
+  const deleteTask = async (deletedTaskId) => {
     const taskFind = tasks.find((task) => task.id === deletedTaskId);
     if (!taskFind) return;
 
-    if (taskFind.status === "Approved") {
-      setTasks(tasks.filter((task) => task.id !== deletedTaskId));
-    } else {
+    if (taskFind.status !== "Approved") {
       alert('You can only delete tasks approved by an admin.');
+      return;
+    }
+
+    try {
+      await api.delete(`/tasks/${deletedTaskId}`);
+      setTasks(tasks.filter((task) => task.id !== deletedTaskId));
+    } catch (err) {
+      alert('Could not delete task.');
     }
   };
 
-  const handleAddAttachment = (taskId, newAttachmentText) => {
-    setTasks(tasks.map((task) => {
-      if (task.id !== taskId) return task;
+  const handleAddAttachment = async (taskId, newAttachmentText) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
 
-      let newStatus = task.status;
-      if (task.status === "To-Do") newStatus = "In Progress";
-      else if (task.status === "In Progress") newStatus = "Under Review";
+    let newStatus = task.status;
+    if (task.status === "To-Do") newStatus = "In Progress";
+    else if (task.status === "In Progress") newStatus = "Under Review";
 
-      return { ...task, attachmentUrl: newAttachmentText, status: newStatus, feedback: "" };
-    }));
+    try {
+      const response = await api.patch(`/tasks/${taskId}`, {
+        attachment_url: newAttachmentText,
+        status: newStatus
+      });
+      setTasks(tasks.map((t) => (t.id === taskId ? response.data : t)));
+    } catch (err) {
+      alert('Could not save attachment.');
+    }
   };
 
-  const approveTask = (taskId) => {
-    setTasks(tasks.map((task) =>
-      task.id === taskId ? { ...task, status: "Approved" } : task
-    ));
+  const approveTask = async (taskId) => {
+    try {
+      const response = await api.patch(`/tasks/${taskId}/approve`);
+      setTasks(tasks.map((t) => (t.id === taskId ? response.data : t)));
+    } catch (err) {
+      alert('Could not approve task.');
+    }
   };
 
-  const declineTask = (taskId, note) => {
-    setTasks(tasks.map((task) =>
-      task.id === taskId ? { ...task, status: "In Progress", feedback: note } : task
-    ));
+  const declineTask = async (taskId, note) => {
+    try {
+      const response = await api.patch(`/tasks/${taskId}/decline`, { feedback: note });
+      setTasks(tasks.map((t) => (t.id === taskId ? response.data : t)));
+    } catch (err) {
+      alert('Could not decline task.');
+    }
   };
 
   const addContainerMarkup = (
@@ -163,21 +195,17 @@ function App() {
 
   let topDropdown = null;
 
-  if (currentUserRole === 'Employee') {
+  if (currentUserRole === 'Admin' && adminMode === 'EmployeeBoard') {
     topDropdown = (
-      <select className="employee-select" value={employeeIdentity} onChange={(e) => setEmployeeIdentity(e.target.value)}>
-        <option value="Employee A">Employee A</option>
-        <option value="Employee B">Employee B</option>
-        <option value="Employee C">Employee C</option>
-      </select>
-    );
-  } else if (currentUserRole === 'Admin' && adminMode === 'EmployeeBoard') {
-    topDropdown = (
-      <select className="employee-select" value={adminViewFilter} onChange={(e) => setAdminViewFilter(e.target.value)}>
+      <select
+        className="employee-select"
+        value={adminViewFilter}
+        onChange={(e) => setAdminViewFilter(e.target.value === "All" ? "All" : Number(e.target.value))}
+      >
         <option value="All">All</option>
-        <option value="Employee A">Employee A</option>
-        <option value="Employee B">Employee B</option>
-        <option value="Employee C">Employee C</option>
+        {users.filter((u) => u.role === 'employee').map((u) => (
+          <option key={u.id} value={u.id}>{u.email}</option>
+        ))}
       </select>
     );
   }
@@ -185,7 +213,7 @@ function App() {
   let headerControlsMarkup = null;
 
   if (currentUserRole === 'Employee') {
-    headerControlsMarkup = <h2>{`Welcome, ${employeeIdentity}!`}</h2>;
+    headerControlsMarkup = <h2>{`Welcome, ${currentUser?.email}!`}</h2>;
   } else if (currentUserRole === 'Admin') {
     headerControlsMarkup = (
       <div className="admin-controls">
@@ -228,9 +256,9 @@ function App() {
           <Column title="For Review" variant="review" fullWidth>
             {displayedTasks.map((task) => (
               <Card key={task.id} title={task.title} description={task.description} id={task.id}
-                status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                 onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+                isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
             ))}
           </Column>
         ) : (
@@ -238,36 +266,36 @@ function App() {
             <Column title="To-Do" variant="todo">
               {displayedTasks.filter((task) => task.status === 'To-Do').map((task) => (
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
-                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
             <Column title="In Progress" variant="progress">
               {displayedTasks.filter((task) => task.status === 'In Progress').map((task) => (
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
-                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
             <Column title="Under Review" variant="review">
               {displayedTasks.filter((task) => task.status === 'Under Review').map((task) => (
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
-                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
 
             <Column title="Approved" variant="approved">
               {displayedTasks.filter((task) => task.status === 'Approved').map((task) => (
                 <Card key={task.id} title={task.title} description={task.description} id={task.id}
-                  status={task.status} onDelete={deleteTask} attachment={task.attachmentUrl}
+                  status={task.status} onDelete={deleteTask} attachment={task.attachment_url}
                   onAddAttachment={handleAddAttachment} onApprove={approveTask} onDecline={declineTask}
-                  isAdmin={currentUserRole === 'Admin'} assignee={task.assignee} feedback={task.feedback} />
+                  isAdmin={currentUserRole === 'Admin'} assignee={getAssigneeEmail(task.assignee_id)} feedback={task.feedback} />
               ))}
             </Column>
           </>
