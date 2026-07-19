@@ -97,27 +97,28 @@ Tasks follow a strict, controlled lifecycle and cannot jump stages arbitrarily:
 
 ## Project Structure
 
+```
 Kanban-Internship-Project/
 ├── kanban-backend/
-│ ├── app/
-│ │ ├── models/ # SQLAlchemy models (User, Task)
-│ │ ├── routers/ # API route handlers (auth, tasks)
-│ │ ├── database.py # DB engine/session setup
-│ │ ├── main.py # FastAPI app entrypoint
-│ │ ├── schemas.py # Pydantic request/response schemas
-│ │ └── utils.py # JWT creation/verification, current-user dependency
-│ ├── alembic/ # Migration environment & versions
-│ ├── alembic.ini
-│ └── requirements.txt
+│   ├── app/
+│   │   ├── models/         # SQLAlchemy models (User, Task)
+│   │   ├── routers/        # API route handlers (auth, tasks)
+│   │   ├── database.py     # DB engine/session setup
+│   │   ├── main.py         # FastAPI app entrypoint
+│   │   ├── schemas.py      # Pydantic request/response schemas
+│   │   └── utils.py        # JWT creation/verification, current-user dependency
+│   ├── alembic/             # Migration environment & versions
+│   ├── alembic.ini
+│   └── requirements.txt
 └── kanban-frontend/
-├── src/
-│ ├── api/ # Axios instance with auth interceptor
-│ ├── components/ # Card, Column, Login components
-│ ├── App.jsx
-│ └── main.jsx
-├── package.json
-└── vite.config.js
-
+    ├── src/
+    │   ├── api/             # Axios instance with auth interceptor
+    │   ├── components/      # Card, Column, Login components
+    │   ├── App.jsx
+    │   └── main.jsx
+    ├── package.json
+    └── vite.config.js
+```
 ## Getting Started
 
 ### Prerequisites
